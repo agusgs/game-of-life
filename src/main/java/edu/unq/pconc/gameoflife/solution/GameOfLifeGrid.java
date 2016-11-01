@@ -3,14 +3,28 @@ package edu.unq.pconc.gameoflife.solution;
 import edu.unq.pconc.gameoflife.CellGrid;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameOfLifeGrid implements CellGrid {
 
+    private ArrayList<Coordenada> celdasVivas;
     private int threads;
+    private int ancho;
+    private int largo;
     private int generations;
     private boolean[][] grid;
+
+    public GameOfLifeGrid(int threads, int ancho, int largo){
+        this.threads = threads;
+        this.ancho = ancho;
+        this.largo = largo;
+        this.celdasVivas = new ArrayList<>();
+    }
+
+    public GameOfLifeGrid(){
+        generations = 0;
+    }
 
     @Override
     public boolean getCell(int col, int row) {
