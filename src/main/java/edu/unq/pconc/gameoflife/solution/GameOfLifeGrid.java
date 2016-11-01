@@ -28,7 +28,7 @@ public class GameOfLifeGrid implements CellGrid {
 
     @Override
     public boolean getCell(int col, int row) {
-        return this.grid[col][row];
+        return celdasVivas.parallelStream().findFirst().filter(coordenada -> coordenada.estaEn(col, row)).isPresent();
     }
 
     @Override
