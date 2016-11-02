@@ -5,6 +5,7 @@ import edu.unq.pconc.gameoflife.CellGrid;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class GameOfLifeGrid implements CellGrid {
 
@@ -28,12 +29,33 @@ public class GameOfLifeGrid implements CellGrid {
 
     @Override
     public boolean getCell(int col, int row) {
-        return celdasVivas.parallelStream().findFirst().filter(coordenada -> coordenada.estaEn(col, row)).isPresent();
+        return busquedaDeCoordenada(col, row).isPresent();
     }
 
     @Override
-    public void setCell(int col, int row, boolean cell) {
-        this.grid[col][row] = cell;
+    public void setCell(int col, int row, boolean estadoASetear) {
+        boolean estadoExistente = this.getCell(col, row);
+        if(estadoASetear && !estadoExistente){
+            crearNuevaCeldaViva(col, row);
+        }
+        if(!estadoASetear && estadoExistente){
+            borrarCeldaViva(col, row);
+        }
+    }
+
+    private void borrarCeldaViva(int col, int row) {
+        celdasVivas.remove(
+                busquedaDeCoordenada(col, row)
+                        .orElseThrow(()->new RuntimeException("La celda que se quiere borrar no existe"))
+        );
+    }
+
+    private void crearNuevaCeldaViva(int col, int row) {
+        celdasVivas.add(new Coordenada(col, row));
+    }
+
+    private Optional<Coordenada> busquedaDeCoordenada(int col, int row) {
+        return celdasVivas.parallelStream().findFirst().filter(coordenada -> coordenada.estaEn(col, row));
     }
 
     @Override
