@@ -1,25 +1,28 @@
 package edu.unq.pconc.gameoflife.solution;
 
 import edu.unq.pconc.gameoflife.CellGrid;
+import edu.unq.pconc.gameoflife.solution.exceptions.LaCeldaQueSeQuiereMatarEstaMuertaException;
+import edu.unq.pconc.gameoflife.solution.exceptions.LaCoordenadaCaeFueraDelTableroException;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class GameOfLifeGrid implements CellGrid {
 
     private ArrayList<Coordenada> celdasVivas;
     private int threads;
     private int ancho;
-    private int largo;
+    private int alto;
     private int generations;
     private boolean[][] grid;
 
-    public GameOfLifeGrid(int threads, int ancho, int largo){
+    public GameOfLifeGrid(int threads, int ancho, int alto){
         this.threads = threads;
         this.ancho = ancho;
-        this.largo = largo;
+        this.alto = alto;
         this.celdasVivas = new ArrayList<>();
     }
 
@@ -29,7 +32,14 @@ public class GameOfLifeGrid implements CellGrid {
 
     @Override
     public boolean getCell(int col, int row) {
+        validarCoordenadaEnTablero(col, row);
         return busquedaDeCoordenada(col, row).isPresent();
+    }
+
+    private void validarCoordenadaEnTablero(int columna, int fila) {
+        if(columna > this.ancho || fila > this.alto){
+            throw new LaCoordenadaCaeFueraDelTableroException(columna, fila);
+        }
     }
 
     @Override
@@ -46,7 +56,7 @@ public class GameOfLifeGrid implements CellGrid {
     private void borrarCeldaViva(int col, int row) {
         celdasVivas.remove(
                 busquedaDeCoordenada(col, row)
-                        .orElseThrow(()->new RuntimeException("La celda que se quiere borrar no existe"))
+                        .orElseThrow(LaCeldaQueSeQuiereMatarEstaMuertaException::new)
         );
     }
 
@@ -55,16 +65,31 @@ public class GameOfLifeGrid implements CellGrid {
     }
 
     private Optional<Coordenada> busquedaDeCoordenada(int col, int row) {
-        return celdasVivas.parallelStream().findFirst().filter(coordenada -> coordenada.estaEn(col, row));
+        return celdasVivas.parallelStream().filter(coordenada -> coordenada.estaEnPunto(col, row)).findFirst();
     }
 
     @Override
     public Dimension getDimension() {
-        return new Dimension(this.grid.length, this.grid[0].length);
+        return new Dimension(ancho, alto);
     }
 
     @Override
-    public void resize(int cellCols, int cellRows) {}
+    public void resize(int ancho, int largo) {
+        eliminarCoordenadasExcedentes(ancho, largo);
+        this.ancho = ancho;
+        this.alto = largo;
+    }
+
+    private void eliminarCoordenadasExcedentes(int ancho, int largo) {
+        if(ancho < this.ancho || largo < this.alto){
+            this.celdasVivas.removeAll(
+                    this.celdasVivas
+                            .parallelStream()
+                            .filter(coordenada -> !coordenada.estaEnPlano(ancho, largo))
+                            .collect(Collectors.toList())
+            );
+        }
+    }
 
     @Override
     public void setThreads(int threads) {
