@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class GameOfLifeGrid implements CellGrid {
 
-    private ArrayList<Coordenada> celdasVivas;
+    private List<Coordenada> celdasVivas;
     private int threads;
     private int ancho;
     private int alto;
@@ -98,9 +98,7 @@ public class GameOfLifeGrid implements CellGrid {
 
     @Override
     public void clear() {
-        int cellCols = this.grid.length;
-        int cellRows = this.grid[0].length;
-        this.grid = new boolean[cellCols][cellRows];
+        this.celdasVivas.clear();
     }
 
     @Override
@@ -110,16 +108,9 @@ public class GameOfLifeGrid implements CellGrid {
 
     @Override
     public void next() {
-        //FALTA DIVIDIR LABURO ENTRE THREADS
-
-        int cellCols = this.grid.length;
-        int cellRows = this.grid[0].length;
-        for (int c = 0; c < cellCols; c++) {
-            for (int r = 0; r < cellRows; r++) {
-                this.updateCellState(c,r);
-            }
-        }
-
+        List<Coordenada> celdasVivas = new ArrayList<>();
+        this.celdasVivas.stream().forEach(coordenada -> coordenada.updateGeneracion(this, celdasVivas));
+        this.celdasVivas = celdasVivas;
         this.generations++;
     }
 
