@@ -18,7 +18,7 @@ public abstract class Coordenada {
 
     public abstract void updateGeneracion(GameOfLifeGrid gameOfLifeGrid, List<Coordenada> celdasVivas);
 
-    protected List<Coordenada> getVecinosVivos(GameOfLifeGrid gameOfLifeGrid) {
+    protected synchronized List<Coordenada> getVecinosVivos(GameOfLifeGrid gameOfLifeGrid) {
         List<Coordenada> vecinos = this.getVecinos(gameOfLifeGrid);
         return vecinos.stream().filter(Coordenada::estaViva).collect(Collectors.toList());
     }
@@ -77,7 +77,9 @@ public abstract class Coordenada {
 
     private void agregarVecinoEn(GameOfLifeGrid gameOfLifeGrid, List<Coordenada> vecinos, int columna, int fila) {
         try {
+            System.out.println("* Buscando vecino col=" + columna + " row=" + fila);
             vecinos.add(gameOfLifeGrid.getCoordenada(columna, fila));
+            System.out.println("* Vevino encontrado");
         }catch (LaCoordenadaCaeFueraDelTableroException e){
             // No tiene vecino de ese lado por lo que no hago nada :)
         }

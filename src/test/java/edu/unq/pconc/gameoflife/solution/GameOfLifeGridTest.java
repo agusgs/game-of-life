@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.omg.CORBA.PUBLIC_MEMBER;
 
 import java.awt.*;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
@@ -264,5 +265,18 @@ public class GameOfLifeGridTest {
         assertThat(grid.getGenerations()).isEqualTo(1);
     }
 
+    @Test
+    public void nextConcurrente(){
+        GameOfLifeGrid grid = new GameOfLifeGrid(10, 200, 200);
+
+        //glider
+        grid.setCell(1, 0, true);
+        grid.setCell(0, 2, true);
+        grid.setCell(1, 2, true);
+        grid.setCell(2, 2, true);
+        grid.setCell(2, 1, true);
+
+        IntStream.of(100).forEach(value -> grid.next());
+    }
 
 }

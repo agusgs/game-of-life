@@ -7,10 +7,9 @@ import java.util.List;
 
 public class ThreadRunner {
     private List<Coordenada> celdas;
-    private boolean termino;
+    private Thread thread;
 
     public ThreadRunner(){
-        termino = false;
         celdas = new ArrayList<>();
     }
 
@@ -19,18 +18,25 @@ public class ThreadRunner {
     }
 
     public void start(GameOfLifeGrid gameOfLifeGrid, List<Coordenada> configuracionNueva) {
-        this.termino = false;
-        Thread thread = new Thread(
-                () -> celdas.stream().forEach(
-                        coordenada -> {
-                            coordenada.updateGeneracion(gameOfLifeGrid, configuracionNueva);
-                            this.termino = true;
-                        }
-                ));
+        this.thread = new Thread(
+                () -> celdas.stream().forEach(coordenada -> {
+                    System.out.println("* Updeteando coordenada x=" + coordenada.getColumna() + " y=" + coordenada.getFila());
+                    System.out.println("*");
+
+                    coordenada.updateGeneracion(gameOfLifeGrid, configuracionNueva);
+
+                    System.out.println("*");
+                    System.out.println("* Fin del update");
+
+                }));
         thread.start();
     }
 
-    public boolean termino() {
-        return termino;
+    public void joinThread() {
+        try {
+            this.thread.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

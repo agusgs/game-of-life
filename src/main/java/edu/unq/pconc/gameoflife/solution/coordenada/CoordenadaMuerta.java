@@ -11,10 +11,14 @@ public class CoordenadaMuerta extends Coordenada {
 
     @Override
     public void updateGeneracion(GameOfLifeGrid gameOfLifeGrid, List<Coordenada> celdasVivas) {
+        System.out.println("* Update para coordenada muerta");
+        System.out.println("* Obteniendo vecinos");
         List<Coordenada> vecinosVivos = getVecinosVivos(gameOfLifeGrid);
         if (vecinosVivos.size() == 3){
+            System.out.println("* Vecinos igual a 3 se agrega coordenada viva");
             celdasVivas.add(new CoordenadaViva(this.columna, this.fila));
         }else {
+            System.out.println("* Vecinos distingo de 3 se agrega coordenada muerta");
             celdasVivas.add(this);
         }
     }
