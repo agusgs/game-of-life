@@ -1,6 +1,7 @@
 package edu.unq.pconc.gameoflife.solution;
 
 import edu.unq.pconc.gameoflife.solution.exceptions.LaCoordenadaCaeFueraDelTableroException;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.omg.CORBA.PUBLIC_MEMBER;
 
@@ -14,7 +15,7 @@ public class GameOfLifeGridTest {
 
     @Test
     public void cuandoSeCreaNoTieneCeldasVivas(){
-        GameOfLifeGrid grid = new GameOfLifeGrid(1, 1, 1);
+        GameOfLifeGrid grid = new GameOfLifeGrid(1, 2, 2);
 
         assertThat(grid.getCell(0,0)).isFalse();
         assertThat(grid.getCell(0,1)).isFalse();
@@ -38,8 +39,8 @@ public class GameOfLifeGridTest {
     public void siAUnaCeldaMuertaLeSeteoEstadoVivaPasaAEstarViva(){
         GameOfLifeGrid grid = new GameOfLifeGrid(1, 2, 2);
 
-
         assertThat(grid.getCell(0,1)).isFalse();
+
         grid.setCell(0, 1, true);
         assertThat(grid.getCell(0,1)).isTrue();
     }
@@ -56,7 +57,7 @@ public class GameOfLifeGridTest {
     }
 
     @Test
-    public void siAUnaCeldaVivaLeSeteoEstadoVidaNoCambia(){
+    public void siAUnaCeldaVivaLeSeteoEstadoVivaNoCambia(){
         GameOfLifeGrid grid = new GameOfLifeGrid(1, 2, 2);
 
         grid.setCell(0, 1, true);
@@ -107,7 +108,7 @@ public class GameOfLifeGridTest {
 
     @Test
     public void siAgrandoUnaGrillaLaConfiguracionOriginalDeCeldasVivasYMuertasSeMantiene(){
-        GameOfLifeGrid grid = new GameOfLifeGrid(1, 1, 1);
+        GameOfLifeGrid grid = new GameOfLifeGrid(1, 2, 2);
         grid.setCell(0,0, true);
         grid.setCell(1,1, true);
 
@@ -141,7 +142,7 @@ public class GameOfLifeGridTest {
 
     @Test
     public void siAchicoUnaGrillaComprometiendoCeldasVivasEstasDejanDeExistir(){
-        GameOfLifeGrid grid = new GameOfLifeGrid(1, 3, 3);
+        GameOfLifeGrid grid = new GameOfLifeGrid(1, 4, 4);
         grid.setCell(0,0, true);
         grid.setCell(3,3, true);
 
@@ -159,7 +160,7 @@ public class GameOfLifeGridTest {
 
     @Test
     public void cuandoHagoClearDeLaGrillaTodasLasCeldasPasanAMuertas(){
-        GameOfLifeGrid grid = new GameOfLifeGrid(1, 1, 1);
+        GameOfLifeGrid grid = new GameOfLifeGrid(1, 2, 2);
 
         grid.setCell(0, 0, true);
         grid.setCell(0, 1, true);
@@ -176,19 +177,22 @@ public class GameOfLifeGridTest {
 
     @Test
     public void siTengoUnaCeldaSinVecinosVivosCuandoSeHaceNextMuereYHayUnaNuevaGeneracion(){
-        GameOfLifeGrid grid = new GameOfLifeGrid(1, 1, 1);
+        GameOfLifeGrid grid = new GameOfLifeGrid(1, 2, 2);
 
         grid.setCell(0, 1, true);
 
         grid.next();
 
         assertThat(grid.getCell(0, 1)).isFalse();
+        assertThat(grid.getCell(0, 0)).isFalse();
+        assertThat(grid.getCell(1, 0)).isFalse();
+        assertThat(grid.getCell(1, 1)).isFalse();
         assertThat(grid.getGenerations()).isEqualTo(1);
     }
 
     @Test
     public void siTengoUnaCeldaConMenosDeDosVecinosCuangoSeHaceNextMuereYHayUnaNuevaGeneracion(){
-        GameOfLifeGrid grid = new GameOfLifeGrid(1, 1, 1);
+        GameOfLifeGrid grid = new GameOfLifeGrid(1, 2, 2);
 
         grid.setCell(0, 1, true);
         grid.setCell(0, 0, true);
@@ -197,12 +201,14 @@ public class GameOfLifeGridTest {
 
         assertThat(grid.getCell(0, 0)).isFalse();
         assertThat(grid.getCell(0, 1)).isFalse();
+        assertThat(grid.getCell(1, 0)).isFalse();
+        assertThat(grid.getCell(1, 1)).isFalse();
         assertThat(grid.getGenerations()).isEqualTo(1);
     }
 
     @Test
     public void SiTengoUnaCeldaVivaCon2VecinosCuandoSeHaceNextViveYHayUnaNuevaGeneracion(){
-        GameOfLifeGrid grid = new GameOfLifeGrid(1, 1, 1);
+        GameOfLifeGrid grid = new GameOfLifeGrid(1, 2, 2);
 
         grid.setCell(0, 0, true);
         grid.setCell(0, 1, true);
@@ -213,12 +219,13 @@ public class GameOfLifeGridTest {
         assertThat(grid.getCell(0, 0)).isTrue();
         assertThat(grid.getCell(0, 1)).isTrue();
         assertThat(grid.getCell(1, 0)).isTrue();
+        assertThat(grid.getCell(1, 1)).isTrue();
         assertThat(grid.getGenerations()).isEqualTo(1);
     }
 
     @Test
     public void SiTengoUnaCeldaVivaCon3VecinosCuandoSeHaceNextViveYHayUnaNuevaGeneracion(){
-        GameOfLifeGrid grid = new GameOfLifeGrid(1, 1, 1);
+        GameOfLifeGrid grid = new GameOfLifeGrid(1, 2, 2);
 
         grid.setCell(0, 0, true);
         grid.setCell(0, 1, true);
@@ -237,7 +244,7 @@ public class GameOfLifeGridTest {
     @Test
     public void siTengoUnaCeldaVivaConMasDe3VecinosMuereDeSobrepoblacion(){
 
-        GameOfLifeGrid grid = new GameOfLifeGrid(1, 2, 2);
+        GameOfLifeGrid grid = new GameOfLifeGrid(1, 3, 3);
 
         grid.setCell(0, 2, true);
         grid.setCell(2, 2, true);
@@ -247,13 +254,21 @@ public class GameOfLifeGridTest {
 
         grid.next();
 
+        assertThat(grid.getCell(0, 0)).isFalse();
+        assertThat(grid.getCell(0, 1)).isTrue();
+        assertThat(grid.getCell(0, 2)).isFalse();
+        assertThat(grid.getCell(1, 0)).isTrue();
         assertThat(grid.getCell(1, 1)).isFalse();
+        assertThat(grid.getCell(1, 2)).isTrue();
+        assertThat(grid.getCell(2, 0)).isFalse();
+        assertThat(grid.getCell(2, 1)).isTrue();
+        assertThat(grid.getCell(2, 2)).isFalse();
         assertThat(grid.getGenerations()).isEqualTo(1);
     }
 
     @Test
     public void siTengoUnaCeldaMuertaConTresVecinosVivosLaReviven(){
-        GameOfLifeGrid grid = new GameOfLifeGrid(1, 2, 2);
+        GameOfLifeGrid grid = new GameOfLifeGrid(1, 3, 3);
 
         grid.setCell(2, 2, true);
         grid.setCell(2, 0, true);
@@ -261,22 +276,31 @@ public class GameOfLifeGridTest {
 
         grid.next();
 
+        assertThat(grid.getCell(0, 0)).isFalse();
+        assertThat(grid.getCell(0, 1)).isFalse();
+        assertThat(grid.getCell(0, 2)).isFalse();
+        assertThat(grid.getCell(1, 0)).isFalse();
         assertThat(grid.getCell(1, 1)).isTrue();
+        assertThat(grid.getCell(1, 2)).isFalse();
+        assertThat(grid.getCell(2, 0)).isFalse();
+        assertThat(grid.getCell(2, 1)).isFalse();
+        assertThat(grid.getCell(2, 2)).isFalse();
         assertThat(grid.getGenerations()).isEqualTo(1);
     }
 
     @Test
     public void nextConcurrente(){
-        GameOfLifeGrid grid = new GameOfLifeGrid(10, 200, 200);
+        GameOfLifeGrid grid = new GameOfLifeGrid(10, 60, 40);
 
-        //glider
         grid.setCell(1, 0, true);
-        grid.setCell(0, 2, true);
+        grid.setCell(1, 1, true);
         grid.setCell(1, 2, true);
-        grid.setCell(2, 2, true);
-        grid.setCell(2, 1, true);
 
-        IntStream.of(100).forEach(value -> grid.next());
+        IntStream.range(0, 10).forEach(value -> grid.next());
+
+        assertThat(grid.getCell(1, 0)).isTrue();
+        assertThat(grid.getCell(1, 1)).isTrue();
+        assertThat(grid.getCell(1, 2)).isTrue();
     }
 
 }
