@@ -22,6 +22,7 @@ public class ThreadRunner {
         this.thread = new Thread(
                 () -> celdas.stream().forEach(coordenada -> coordenada.updateGeneracion(gameOfLifeGrid, configuracionNueva)));
         thread.start();
+
     }
 
     public void joinThread() {
@@ -30,5 +31,9 @@ public class ThreadRunner {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void cleanList() {
+        this.celdas.clear();
     }
 }

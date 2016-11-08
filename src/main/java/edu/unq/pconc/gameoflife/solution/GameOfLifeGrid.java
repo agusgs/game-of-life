@@ -153,6 +153,7 @@ public class GameOfLifeGrid implements CellGrid {
         tablero.values().forEach(celda -> this.nextThread().add(celda));
         threads.stream().forEach(thread -> thread.start(this, configuracionNueva));
         threads.forEach(ThreadRunner::joinThread);
+        threads.forEach(ThreadRunner::cleanList);
     }
 
     private ThreadRunner nextThread() {
