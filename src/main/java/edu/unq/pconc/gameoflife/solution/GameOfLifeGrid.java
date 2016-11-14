@@ -163,4 +163,8 @@ public class GameOfLifeGrid implements CellGrid {
         }
         return threads.get(threadActual);
     }
+
+    public int getThreadsSize() {
+        return threads.size();
+    }
 }

@@ -303,4 +303,22 @@ public class GameOfLifeGridTest {
         assertThat(grid.getCell(1, 2)).isTrue();
     }
 
+    //------Tests para el 100%----------//
+
+    @Test
+    public void gameOfLifeGridConstructor(){
+        GameOfLifeGrid grid = new GameOfLifeGrid();
+
+        assertThat(grid.getGenerations()).isEqualTo(0);
+        assertThat(grid.getDimension()).isEqualTo(new Dimension(0,0));
+    }
+
+    @Test
+    public void setThreads(){
+        GameOfLifeGrid grid = new GameOfLifeGrid();
+        grid.setThreads(5);
+
+        assertThat(grid.getThreadsSize()).isEqualTo(5);
+    }
+
 }
