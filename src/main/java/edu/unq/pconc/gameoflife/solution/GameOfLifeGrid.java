@@ -2,6 +2,7 @@ package edu.unq.pconc.gameoflife.solution;
 
 import edu.unq.pconc.gameoflife.CellGrid;
 import edu.unq.pconc.gameoflife.solution.celda.Celda;
+import edu.unq.pconc.gameoflife.solution.celda.CeldaBuffer;
 import edu.unq.pconc.gameoflife.solution.celda.CeldaMuerta;
 import edu.unq.pconc.gameoflife.solution.celda.CeldaViva;
 import edu.unq.pconc.gameoflife.solution.exceptions.LaCoordenadaCaeFueraDelTableroException;
@@ -17,14 +18,14 @@ public class GameOfLifeGrid implements CellGrid {
 
     private Map<Coordenada, Celda> tablero;
     private List<ThreadRunner> threads;
+    private CeldaBuffer buffer;
     private int ancho;
     private int alto;
     private int generations;
-    private int threadActual;
 
     public GameOfLifeGrid(int threads, int ancho, int alto){
-        this.threads = crearThreads(threads);
-        this.threadActual = 0;
+        this.buffer = new CeldaBuffer(this);
+        this.threads = crearThreads(threads, buffer);
         this.ancho = ancho;
         this.alto = alto;
         this.tablero = configuracionInicial(ancho, alto);
@@ -35,13 +36,17 @@ public class GameOfLifeGrid implements CellGrid {
         ancho = 0;
         alto = 0;
         threads = new ArrayList<>();
-        threadActual = 0;
         tablero = new Hashtable<>();
+        buffer = new CeldaBuffer(this);
     }
 
-    private List<ThreadRunner> crearThreads(int cantidadDeThreads) {
+    private List<ThreadRunner> crearThreads(int cantidadDeThreads, CeldaBuffer buffer) {
         List<ThreadRunner> threads = new ArrayList<>();
-        IntStream.range(0, cantidadDeThreads).forEach(valor -> threads.add(new ThreadRunner()));
+        IntStream.range(0, cantidadDeThreads).forEach(valor -> {
+            ThreadRunner newThread = new ThreadRunner(buffer);
+            threads.add(newThread);
+            newThread.start();
+        });
         return threads;
     }
 
@@ -125,8 +130,7 @@ public class GameOfLifeGrid implements CellGrid {
 
     @Override
     public synchronized void setThreads(int cantidadDeThreads) {
-        this.threads = crearThreads(cantidadDeThreads);
-        this.threadActual = 0;
+        this.threads = crearThreads(cantidadDeThreads, buffer);
     }
 
     @Override
@@ -150,18 +154,8 @@ public class GameOfLifeGrid implements CellGrid {
     }
 
     private void paralelizarNext(Map<Coordenada, Celda> configuracionNueva) {
-        tablero.values().forEach(celda -> this.nextThread().add(celda));
-        threads.stream().forEach(thread -> thread.start(this, configuracionNueva));
-        threads.forEach(ThreadRunner::joinThread);
-        threads.forEach(ThreadRunner::cleanList);
-    }
-
-    private ThreadRunner nextThread() {
-        this.threadActual = this.threadActual + 1;
-        if(this.threadActual >= threads.size()){
-            threadActual = 0;
-        }
-        return threads.get(threadActual);
+        buffer.setNuevaConfiguracion(configuracionNueva);
+        tablero.values().forEach(celda -> buffer.add(celda));
     }
 
     public int getThreadsSize() {

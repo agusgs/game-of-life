@@ -1,39 +1,17 @@
 package edu.unq.pconc.gameoflife.solution;
 
-import edu.unq.pconc.gameoflife.solution.celda.Celda;
+import edu.unq.pconc.gameoflife.solution.celda.CeldaBuffer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+public class ThreadRunner extends Thread {
+    private final CeldaBuffer buffer;
 
-public class ThreadRunner {
-    private List<Celda> celdas;
-    private Thread thread;
-
-    public ThreadRunner(){
-        celdas = new ArrayList<>();
+    public ThreadRunner(CeldaBuffer buffer){
+        this.buffer = buffer;
     }
 
-    public void add(Celda celda) {
-        this.celdas.add(celda);
-    }
-
-    public void start(GameOfLifeGrid gameOfLifeGrid, Map<Coordenada, Celda> configuracionNueva) {
-        this.thread = new Thread(
-                () -> celdas.stream().forEach(coordenada -> coordenada.updateGeneracion(gameOfLifeGrid, configuracionNueva)));
-        thread.start();
-
-    }
-
-    public void joinThread() {
-        try {
-            this.thread.join();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+    public void run() {
+        while (true) {
+            buffer.procesarCelda();
         }
-    }
-
-    public void cleanList() {
-        this.celdas.clear();
     }
 }
