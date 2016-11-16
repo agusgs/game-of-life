@@ -8,6 +8,7 @@ import org.omg.CORBA.PUBLIC_MEMBER;
 import java.awt.*;
 import java.util.stream.IntStream;
 
+import static java.lang.Thread.sleep;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 
@@ -296,7 +297,9 @@ public class GameOfLifeGridTest {
         grid.setCell(1, 1, true);
         grid.setCell(1, 2, true);
 
-        IntStream.range(0, 10).forEach(value -> grid.next());
+        IntStream.range(0, 10).forEach(value -> {
+            grid.next();
+        });
 
         assertThat(grid.getCell(1, 0)).isTrue();
         assertThat(grid.getCell(1, 1)).isTrue();

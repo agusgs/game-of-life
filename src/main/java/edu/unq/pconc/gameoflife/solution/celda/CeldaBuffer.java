@@ -3,10 +3,7 @@ package edu.unq.pconc.gameoflife.solution.celda;
 import edu.unq.pconc.gameoflife.solution.Coordenada;
 import edu.unq.pconc.gameoflife.solution.GameOfLifeGrid;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CeldaBuffer {
     private GameOfLifeGrid gameOfLifeGrid;
@@ -23,8 +20,8 @@ public class CeldaBuffer {
         this.nuevaConfiguracion = nuevaConfiguracion;
     }
 
-    public synchronized void add(Celda celda) {
-        this.celdas.add(celda);
+    public synchronized void addAll(Collection<Celda> values) {
+        this.celdas.addAll(values);
         this.notify();
     }
 
@@ -32,11 +29,7 @@ public class CeldaBuffer {
         return !this.celdas.isEmpty();
     }
 
-    public void procesarCelda() {
-        this.pop().updateGeneracion(gameOfLifeGrid, nuevaConfiguracion);
-    }
-
-    private synchronized Celda pop() {
+    public synchronized void procesarCelda() {
         while(!tieneTrabajoPendiente()){
             try {
                 this.wait();
@@ -46,6 +39,9 @@ public class CeldaBuffer {
         }
         Celda celda = this.celdas.get(0);
         this.celdas.remove(celda);
-        return celda;
+
+        celda.updateGeneracion(gameOfLifeGrid, nuevaConfiguracion);
+        gameOfLifeGrid.celdaProcesada();
+
     }
 }

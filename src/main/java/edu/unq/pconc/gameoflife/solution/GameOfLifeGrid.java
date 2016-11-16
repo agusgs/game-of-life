@@ -53,11 +53,16 @@ public class GameOfLifeGrid implements CellGrid {
     private Map<Coordenada, Celda> configuracionInicial(int ancho, int alto) {
         Map<Coordenada, Celda> tablero = new Hashtable<>();
 
-        IntStream.range(0, ancho).forEach(coordenadaAncho -> {
-            IntStream.range(0, alto).forEach(coordenadaAlto -> {
-                tablero.put(new Coordenada(coordenadaAncho, coordenadaAlto), new CeldaMuerta(coordenadaAncho, coordenadaAlto));
-            });
-        });
+        IntStream.range(0, ancho)
+                .forEach(coordenadaAncho ->
+                        IntStream.range(0, alto)
+                                .forEach(coordenadaAlto ->
+                                        tablero.put(
+                                                new Coordenada(coordenadaAncho, coordenadaAlto),
+                                                new CeldaMuerta(coordenadaAncho, coordenadaAlto)
+                                        )
+                                )
+                );
         return tablero;
     }
 
@@ -149,16 +154,28 @@ public class GameOfLifeGrid implements CellGrid {
 
         this.paralelizarNext(configuracionNueva);
 
+        while (configuracionNueva.size() < this.tablero.size()){
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         this.tablero = configuracionNueva;
         this.generations++;
     }
 
     private void paralelizarNext(Map<Coordenada, Celda> configuracionNueva) {
         buffer.setNuevaConfiguracion(configuracionNueva);
-        tablero.values().forEach(celda -> buffer.add(celda));
+        buffer.addAll(tablero.values());
     }
 
     public int getThreadsSize() {
         return threads.size();
+    }
+
+    public synchronized void celdaProcesada() {
+        this.notify();
     }
 }
