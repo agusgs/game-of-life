@@ -1,6 +1,4 @@
-#Programacion Concurrente
-
-##Trabajo Practico
+#Game of life
 
 Se desea implementar en Java usando metodos synchronized una clase “monitor” que encapsule el comportamiento del Juego
 de la Vida de John Conway. El juego de la vida es una simulacion en un universo en forma de grilla bidimensional en
